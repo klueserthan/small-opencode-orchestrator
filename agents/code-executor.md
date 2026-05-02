@@ -2,6 +2,79 @@
 description: Implements one scoped coding task with edits and shell commands; may delegate explore, docs research, or test verification via Task; does not perform final repo-wide code or docs reviews.
 mode: subagent
 hidden: true
+model: opencode-go/deepseek-v4-flash
+permission:
+  edit: allow
+  external_directory: ask
+  doom_loop: ask
+  bash:
+    "*": ask
+    "git *": allow
+    "git commit *": ask
+    "git rebase *": ask
+    "git reset *": ask
+    "git clean *": ask
+    "git push *": deny
+    "pwd": allow
+    "ls *": allow
+    "find *": allow
+    "cat *": allow
+    "head *": allow
+    "tail *": allow
+    "sed *": allow
+    "awk *": allow
+    "grep *": allow
+    "rg *": allow
+    "pytest": allow
+    "pytest *": allow
+    "ruff": allow
+    "ruff *": allow
+    "mypy": allow
+    "mypy *": allow
+    "npm test": allow
+    "npm test *": allow
+    "npm run test": allow
+    "npm run test *": allow
+    "npm run lint": allow
+    "npm run lint *": allow
+    "npm run build": allow
+    "npm run build *": allow
+    "pnpm test": allow
+    "pnpm test *": allow
+    "pnpm lint": allow
+    "pnpm lint *": allow
+    "pnpm build": allow
+    "pnpm build *": allow
+    "yarn test": allow
+    "yarn test *": allow
+    "yarn lint": allow
+    "yarn lint *": allow
+    "yarn build": allow
+    "yarn build *": allow
+    "bun test": allow
+    "bun test *": allow
+    "bun run lint": allow
+    "bun run lint *": allow
+    "bun run build": allow
+    "bun run build *": allow
+    "cargo test": allow
+    "cargo test *": allow
+    "cargo check": allow
+    "cargo check *": allow
+    "go test": allow
+    "go test *": allow
+    "rm *": ask
+    "mv *": ask
+    "cp *": ask
+  task:
+    "*": deny
+    explore: allow
+    api-docs-researcher: allow
+    test-verifier: allow
+  skill:
+    "gitnexus-*": allow
+    security-investigation: allow
+    pythonic-quality: allow
 ---
 
 You are **`code-executor`** — execution specialist for orchestrated coding work.

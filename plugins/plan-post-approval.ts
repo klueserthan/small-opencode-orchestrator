@@ -37,6 +37,7 @@ type RequestMeta = {
 type QueuedHandoff = {
   planFile: string | null;
   answersJson: string;
+  handoffAgent: string;
 };
 
 const DEFAULT_PLAN_HANDOFF_AGENT = "build";
@@ -82,6 +83,31 @@ function resolvePlanPostApprovalHandoffAgent(configData: unknown): string {
   return DEFAULT_PLAN_HANDOFF_AGENT;
 }
 
+/** Last chronological `agent` field on user messages — typically the routing primary for that turn. */
+async function lastUserRoutingAgent(
+  client: PluginInput["client"],
+  sessionID: string,
+  directory: string,
+): Promise<string | null> {
+  const msgs = await client.session.messages({
+    path: { id: sessionID },
+    query: { directory, limit: 400 },
+  });
+  if (msgs.error || !msgs.data?.length) return null;
+  let last: string | null = null;
+  for (const m of msgs.data) {
+    const info = m.info;
+    if (
+      "role" in info &&
+      info.role === "user" &&
+      "agent" in info &&
+      typeof (info as { agent?: unknown }).agent === "string"
+    ) {
+      last = (info as { agent: string }).agent;
+    }
+  }
+  return last;
+}
 function buildApprovedPlanHandoffText(input: {
   compactionNote: string;
   planPath: string;
@@ -328,9 +354,48 @@ const PlanPostApprovalPlugin: Plugin = async ({ client, directory }) => {
           }
           return;
         }
+        const cfgOnApprove = await client.config.get({ query: { directory } });
+        const cfgData = cfgOnApprove.data;
+        const globalHandoff = resolvePlanPostApprovalHandoffAgent(cfgData);
+        let routingAgent = await lastUserRoutingAgent(
+          client,
+          sessionID,
+          directory,
+        );
+        if (!routingAgent && cfgData && typeof cfgData === "object" && !Array.isArray(cfgData)) {
+          const d = (cfgData as Record<string, unknown>).default_agent;
+          if (typeof d === "string" && d.trim()) routingAgent = d.trim();
+        }
+        /** Orchestrator Phase B continues in-session; queued idle prompt would duplicate automation. */
+        if (
+          routingAgent === "orchestrator" &&
+          globalHandoff === "orchestrator"
+        ) {
+          try {
+            await client.app.log({
+              query: { directory },
+              body: {
+                service: "plan-post-approval",
+                level: "info",
+                message:
+                  "Routing orchestrator + orchestrator handoff target: skipping queued session.prompt (duplicate).",
+                extra: { sessionID, requestID, routingAgent, globalHandoff },
+              },
+            });
+          } catch {
+            /* optional logging */
+          }
+          return;
+        }
+        /** `plan` primary must hand off to `build`; do not reuse global orchestrator knob here. */
+        const handoffTarget =
+          routingAgent === "plan"
+            ? DEFAULT_PLAN_HANDOFF_AGENT
+            : globalHandoff;
         handoffAfterIdle.set(sessionID, {
           planFile: meta.planFile,
           answersJson: JSON.stringify(answers),
+          handoffAgent: handoffTarget,
         });
         return;
       }
@@ -345,8 +410,7 @@ const PlanPostApprovalPlugin: Plugin = async ({ client, directory }) => {
           queued.planFile ??
           "(open the latest file under .opencode/plans/ if the path is missing)";
 
-        const cfgForHandoff = await client.config.get({ query: { directory } });
-        const handoffAgent = resolvePlanPostApprovalHandoffAgent(cfgForHandoff.data);
+        const handoffAgent = queued.handoffAgent;
 
         let compactionNote: string;
         try {

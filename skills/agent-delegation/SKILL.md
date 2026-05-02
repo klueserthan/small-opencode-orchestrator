@@ -5,23 +5,20 @@ description: "Use when the primary agent must decide whether to delegate via the
 
 # Subagent delegation (OpenCode)
 
-Must respect `permission.task` on the active primary agent (`build` vs `plan` vs `orchestrator` have different allowlists). The `plan` agent cannot invoke `test-verifier`, `code-reviewer`, `security-reviewer`, or `docs-reviewer` via Task. The `plan` agent **may** invoke `host-security-investigator` when it appears in `permission.task` (read-only hosting and service investigation). The **`orchestrator`** agent drives Task `plan-runner`, `code-executor`, and the usual reviewers per its prompt; it does not implement code directly.
+Must respect `permission.task` in the active primary agent's frontmatter (`agents/<id>.md` — `build` vs `plan` vs `orchestrator` have different allowlists). The `plan` agent cannot invoke `test-verifier`, `code-reviewer`, `security-reviewer`, or `docs-reviewer` via Task. The `plan` agent **may** invoke `host-security-investigator` when it appears in `permission.task` (read-only hosting and service investigation). The **`orchestrator`** agent drives Task `plan-runner`, `code-executor`, and the usual reviewers per its prompt; it does not implement code directly.
 
-## Decision table
-
-| Situation                                                | Subagent id           | Notes                                              |
-| -------------------------------------------------------- | --------------------- | -------------------------------------------------- |
-| Fast repo discovery, find symbols/files, read-only       | `explore`             | Prefer over spelunking in the primary thread       |
-| Broader multi-step research or exploration with tools     | `general`             | When `explore` is not enough (not on `plan`/`orchestrator` allowlists unless added) |
-| Plan file draft for orchestrator flow (then parent gates approval) | `plan-runner` | Writes `.opencode/plans/`; does not emit PlanApprove |
-| Scoped implementation slice delegated by orchestrator     | `code-executor`      | Mirrors build-style edits for one slice; no final repo reviewers |
-| Challenge a plan before coding                           | `spec-critic`         | Ambiguous, architectural, multi-module work        |
-| Official docs / API / migration facts before coding      | `api-docs-researcher` | Third-party SDKs, frameworks, rate limits, auth    |
-| After implementation: tests, lint, typecheck, acceptance | `test-verifier`       | Requires evidence; never claim pass without output |
-| Auth, secrets, input validation, shell/network safety    | `security-reviewer`   | Overlap with sensitive code paths                  |
-| Hosting posture, exposed services, TLS, IaC, containers (read-only) | `host-security-investigator` | Not for app code review; SSH/scp/rsync need approval per invocation |
-| Pre-merge quality: correctness, fit, regressions         | `code-reviewer`       | Meaningful diffs                                   |
-| Docs impact: README, env, CLI, public API, setup         | `docs-reviewer`       | User-visible behavior changed                      |
+- Always spawn the subagents respecting the models defined for each one.
+- Use `code-explorer` for reading and exploring codebase files, architecture mapping, and symbol location. This is the dedicated read-only exploration agent.
+- Use `explore` for fast read-only codebase discovery when `code-explorer` is unnecessary (built-in platform agent).
+- Use `code-executor` for implementing and writing code. This agent writes only — delegate exploration to `code-explorer` first when needed.
+- Use `general` for heavier multi-step research or exploration when `explore` is too narrow (still via Task when permitted).
+- Use `spec-critic` before implementation when the task is ambiguous, architectural, or spans multiple modules.
+- Use `api-docs-researcher` before coding against third-party APIs, SDKs, migrations, or recent framework behavior.
+- Use `test-verifier` after implementation.
+- Use `security-reviewer` when auth, secrets, file handling, shell execution, external input, network calls, permissions, or multi-tenant logic are involved.
+- Use `host-security-investigator` when you need a read-only assessment of hosting posture, exposed services, TLS, SSH access patterns, containers, or infrastructure-as-code (not for code-reviewing application logic).
+- Use `code-reviewer` before finalizing any meaningful diff. This agent reviews only — it does not write or explore.
+- Use `docs-reviewer` when user-facing behavior, config, env vars, CLI, API shape, or setup steps changed.
 
 ## Gold rule: minimal child prompt
 

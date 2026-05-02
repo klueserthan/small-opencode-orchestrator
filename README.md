@@ -58,12 +58,14 @@ This configuration provides:
 
 ### Plan Post-Approval
 
-`plugins/plan-post-approval.ts` automates the handoff after a plan is approved:
+`plugins/plan-post-approval.ts` automates the handoff after a plan is approved (`PlanApprove`):
 
 - Extracts plan file paths from approval questions
-- Triggers context compaction via summarize API
-- Delegates to the configured handoff agent (default: `build`)
-- Implements retry logic with exponential backoff for resilience
+- Uses the last user message **`agent`** field as routing context
+- **`plan`** sessions always hand off to **`build`** after idle (`session.summarize` + `session.prompt`)
+- **`orchestrator`** sessions skip the queued **`session.prompt`** when `agent.orchestrator.plan_post_approval_handoff_agent` is **`orchestrator`** (avoid duplicate Phase B automation after long runs)
+- Other routing uses `plan_post_approval_handoff_agent` from **`opencode.jsonc`** under **`agent.orchestrator`** or root (default **`build`**)
+- Implements retries with backoff for **`session.prompt`**
 
 ## Skills
 
@@ -93,9 +95,9 @@ The orchestrator agent is configured as the default. Start OpenCode and describe
 
 Key settings in `opencode.jsonc`:
 
-- `default_agent: "orchestrator"` — Sets the orchestrator as the entry point
-- `permission.bash` — Fine-grained shell command permissions with safe defaults
-- `agent.*.permission` — Subagent-specific tool permissions
+- **`default_agent: "orchestrator"`** — Orchestrator entry point for multi-phase Task workflows
+- **`permission`** — Minimal deny-by-default workspace baseline; each agent declares full tool policy in **`agents/<id>.md`** frontmatter
+- **`agent.*`** — **`model`** in JSON for **`build`**, **`plan`**, **`orchestrator`**, **`plan-runner`**; **`model`** for flash subagents in **`agents/<id>.md`**; **`reasoningEffort`** / **`textVerbosity`** / **`temperature`** in JSON as needed; **`plan_post_approval_handoff_agent`** under **`agent.orchestrator`** for the plan-post-approval plugin
 
 ## License
 

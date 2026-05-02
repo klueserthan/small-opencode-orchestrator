@@ -2,8 +2,11 @@
 description: Check whether a code change requires documentation updates in README, setup steps, env vars, config docs, examples, CLI docs, or public API docs.
 mode: subagent
 hidden: true
+model: opencode-go/deepseek-v4-flash
 temperature: 0.1
 permission:
+  external_directory: ask
+  doom_loop: ask
   edit: deny
   bash:
     "*": deny

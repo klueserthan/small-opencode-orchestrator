@@ -2,8 +2,11 @@
 description: Read-only codebase explorer — reads files, traverses directories, maps architecture, locates symbols, and reports findings without making edits.
 mode: subagent
 hidden: true
+model: opencode-go/deepseek-v4-flash
 temperature: 0.2
 permission:
+  external_directory: ask
+  doom_loop: ask
   edit: deny
   bash:
     "*": deny
@@ -16,6 +19,9 @@ permission:
     "grep *": allow
     "rg *": allow
     "git *": allow
+  task:
+    explore: allow
+    api-docs-researcher: allow
   webfetch: allow
   websearch: deny
 ---
