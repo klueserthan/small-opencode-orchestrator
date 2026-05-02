@@ -86,16 +86,8 @@ This keeps the main agent focused on coordination instead of forcing one large p
 │   ├── docs-reviewer.md
 │   ├── security-reviewer.md
 │   └── host-security-investigator.md
-├── skills/                   # Reusable skill definitions
+├── skills/                   # Reusable skill definitions (committed)
 │   ├── agent-delegation/
-│   ├── context7/
-│   ├── gitnexus-cli/
-│   ├── gitnexus-debugging/
-│   ├── gitnexus-exploring/
-│   ├── gitnexus-guide/
-│   ├── gitnexus-impact-analysis/
-│   ├── gitnexus-pr-review/
-│   ├── gitnexus-refactoring/
 │   ├── pythonic-quality/
 │   ├── security-investigation/
 │   ├── skill-creator/
@@ -103,6 +95,8 @@ This keeps the main agent focused on coordination instead of forcing one large p
 └── plugins/
     └── plan-post-approval.ts # Automated plan handoff
 ```
+
+**Local-only skills (not tracked; see `.gitignore`):** add `skills/context7/` or `skills/gitnexus-*` on your machine if you use those toolchains. Agent configs may still reference `gitnexus-*` in skill permissions.
 
 ## Agents
 
