@@ -31,13 +31,13 @@
   // Strong models for the primary agents
   "agent": {
     "build": {
-      "model": "deepseek-v4-pro",
+      "model": "opencode-go/deepseek-v4-pro",
       "reasoningEffort": "xhigh",
       "textVerbosity": "medium",
     },
 
     "plan": {
-      "model": "deepseek-v4-pro",
+      "model": "opencode-go/deepseek-v4-pro",
       "reasoningEffort": "xhigh",
       "textVerbosity": "medium",
     },
@@ -45,14 +45,14 @@
     "orchestrator": {
       // plan-post-approval plugin reads this path only (not merged from agent frontmatter).
       "plan_post_approval_handoff_agent": "orchestrator",
-      "model": "deepseek-v4-pro",
+      "model": "opencode-go/deepseek-v4-pro",
       "reasoningEffort": "xhigh",
       "textVerbosity": "medium",
       "temperature": 0.2,
     },
 
     "plan-runner": {
-      "model": "deepseek-v4-pro",
+      "model": "opencode-go/deepseek-v4-pro",
       "reasoningEffort": "xhigh",
       "textVerbosity": "medium",
       "temperature": 0.2,
