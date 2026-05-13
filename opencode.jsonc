@@ -52,7 +52,7 @@
     },
 
     "plan-runner": {
-    // stick with pro here aswell if you accept the speed vs quality tradeoff
+      // stick with pro here aswell if you accept the speed vs quality tradeoff
       "model": "opencode-go/deepseek-v4-flash",
       "reasoningEffort": "max",
       "textVerbosity": "medium",

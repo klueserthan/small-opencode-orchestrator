@@ -38,7 +38,7 @@ It aims to:
 - Make agent responsibilities clear
 - Avoid excessive automation that hides what is happening
 - Provide a useful starting point for customizing OpenCode workflows
-- Sync the improvements on my own personal workflow.
+- Sync the improvements with my own personal workflow.
 
 ## How the workflow works
 
@@ -58,42 +58,62 @@ This keeps the main agent focused on coordination instead of forcing one large p
 ## Structure
 
 ```text
-.
-├── AGENTS.md                 # Global agent rules and delegation guidelines
-├── LICENSE
-├── README.md
-├── opencode.jsonc            # Main OpenCode configuration
-├── package.json              # Plugin / tooling dependencies
-├── package-lock.json
-├── tsconfig.json             # TypeScript configuration (plugins)
-├── tui.json                  # TUI settings (if used)
-├── command/                  # Optional OpenCode command hooks (may be empty)
-├── .opencode/
-│   ├── package.json          # Additional deps used under `.opencode` (SDK / plugins)
-│   ├── package-lock.json
-│   └── plans/                # Concrete plans (plan-runner / approval flow)
-├── agents/                   # Agent definitions
-│   ├── orchestrator.md       # Workflow coordinator
-│   ├── build.md              # Primary implementation agent
-│   ├── plan.md               # Planning agent
-│   ├── plan-runner.md        # Plan drafting subagent
-│   ├── code-explorer.md      # Read-only codebase exploration
-│   ├── code-executor.md      # Implementation subagent
-│   ├── api-docs-researcher.md
-│   ├── spec-critic.md
-│   ├── test-verifier.md
-│   ├── code-reviewer.md
-│   ├── docs-reviewer.md
-│   ├── security-reviewer.md
-│   └── host-security-investigator.md
-├── skills/                   # Reusable skill definitions (committed)
-│   ├── agent-delegation/
-│   ├── pythonic-quality/
-│   ├── security-investigation/
-│   ├── skill-creator/
-│   └── task-management/
-└── plugins/
-    └── plan-post-approval.ts # Automated plan handoff
+├── 📁 agents                                      # Agent definitions
+│   ├── 📝 api-docs-researcher.md
+│   ├── 📝 code-executor.md                        # Implementation subagent        
+│   ├── 📝 code-explorer.md                        # Read-only subagent
+│   ├── 📝 code-reviewer.md                         
+│   ├── 📝 docs-reviewer.md
+│   ├── 📝 host-security-investigator.md           
+│   ├── 📝 orchestrator.md                         # Workflow coordinator (No writting. Only analysis, context managment and delegation to subagents)
+│   ├── 📝 plan-runner.md                          # Plan drafting subagent apart from opencode Plan default agent, so we don't mess with that.
+│   ├── 📝 security-reviewer.md                    
+│   ├── 📝 spec-critic.md
+│   └── 📝 test-verifier.md
+├── 📁 command                                     # Optional OpenCode command hooks (may be empty)  
+├── 📁 plugins
+│   └── 📄 plan-post-approval.ts
+├── 📁 skills
+│   ├── 📁 agent-delegation
+│   │   └── 📝 SKILL.md
+│   ├── 📁 context7
+│   │   ├── 📝 README.md
+│   │   ├── 📝 SKILL.md
+│   │   ├── 📝 library-registry.md
+│   │   └── 📝 navigation.md
+│   ├── 📁 pythonic-quality
+│   │   └── 📝 SKILL.md
+│   ├── 📁 security-investigation
+│   │   ├── 📁 references
+│   │   │   └── 📝 vps-checklist.md
+│   │   ├── 📁 scripts
+│   │   │   └── 📄 vps-security-scan.sh
+│   │   └── 📝 SKILL.md
+│   ├── 📁 skill-creator
+│   │   ├── 📁 references
+│   │   │   ├── 📝 output-patterns.md
+│   │   │   └── 📝 workflows.md
+│   │   ├── 📁 scripts
+│   │   │   ├── 🐍 init_skill.py
+│   │   │   ├── 🐍 package_skill.py
+│   │   │   └── 🐍 quick_validate.py
+│   │   ├── 📄 LICENSE.txt
+│   │   └── 📝 SKILL.md
+│   └── 📁 task-management
+│       ├── 📁 scripts
+│       │   ├── 📄 migrate-schema.ts
+│       │   └── 📄 task-cli.ts
+│       ├── 📝 SKILL.md
+│       └── 📄 router.sh
+├── ⚙️ .gitignore
+├── 📝 AGENTS.md                                   # Global agent rules and delegation guidelines
+├── 📄 LICENSE
+├── 📝 README.md
+├── 📄 opencode.jsonc                              # Main OpenCode configuration
+├── ⚙️ package-lock.json
+├── ⚙️ package.json                                # Plugin / tooling dependencies
+├── ⚙️ tsconfig.json                               # Typescript configuration          
+└── ⚙️ tui.json                                    # TUI settings (if used)
 ```
 
 **Local-only skills (not tracked; see `.gitignore`):** add `skills/context7/` or `skills/gitnexus-*` on your machine if you use those toolchains. Agent configs may still reference `gitnexus-*` in skill permissions.
@@ -103,8 +123,8 @@ This keeps the main agent focused on coordination instead of forcing one large p
 ### Primary agents (Strong models) - Currently Using Kimi K2.6/DeepSeek V4 Pro/GLM 5.1
 
 - **orchestrator** - Coordinates multi-phase work through plan files, approval gates, and implementation slices
-- **build** - OpenCode Default Agent
-- **plan** - OpenCode Default Agent
+- **build** - OpenCode Default Agent (Best for simple tasks)
+- **plan** - OpenCode Default Agent  (Best for simple tasks)
 
 ### Subagents (Cheap models) - Currently Using DeepSeek V4 Flash
 
@@ -201,3 +221,24 @@ Key settings in `opencode.jsonc`:
 - **`agent.*.model`** - Configures model selection for primary agents and selected subagents
 - **`reasoningEffort`**, **`textVerbosity`**, and **`temperature`** - Tune agent behavior where needed
 - **`agent.orchestrator.plan_post_approval_handoff_agent`** - Controls post-approval routing for the plan handoff plugin
+
+
+## Changelog
+
+### [1.1.0] — 2026-05-12
+
+- **Changed**
+  - Orchestrator agent now don't have write permissions by default so we can force subagent usage.
+  - Updated agent configurations (orchestrator and all subagents)
+  - Updated `opencode.jsonc` with refined model routing, reasoning effort, and permission settings
+  - Updated README with structure, workflow, and configuration documentation
+- **Fixed**
+  - Corrected model names in agent configurations
+  - Added DeepSeek max reasoning effort support in `opencode.jsonc`
+- **Removed**
+  - Build and Plan customization. The config now uses the opencode default Build and Plan agents. Add `agents/build.md` and `agents/plan.md` if you want to override.
+
+### [1.0.0] — 2026-05-02
+
+Initial release: multi-agent orchestrator pattern with planning, code execution, and review subagents.
+

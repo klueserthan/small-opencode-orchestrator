@@ -9,9 +9,8 @@ Must respect `permission.task` in the active primary agent's frontmatter (`agent
 
 - Always spawn the subagents respecting the models defined for each one.
 - Use `code-explorer` for reading and exploring codebase files, architecture mapping, and symbol location. This is the dedicated read-only exploration agent.
-- Use `explore` for fast read-only codebase discovery when `code-explorer` is unnecessary (built-in platform agent).
+- Use `explore` for fast read-only codebase discovery when `code-explorer` is unnecessary (built-in platform agent), but **not from `orchestrator`**. The `orchestrator` agent's repo-discovery path is always `code-explorer`.
 - Use `code-executor` for implementing and writing code. This agent writes only — delegate exploration to `code-explorer` first when needed.
-- Use `general` for heavier multi-step research or exploration when `explore` is too narrow — **Task** only if `permission.task` allows it (**`build`** commonly does). The **`orchestrator`** agent does **not** list `general`; use **`code-explorer`** or **`explore`** instead.
 - Use `spec-critic` before implementation when the task is ambiguous, architectural, or spans multiple modules.
 - Use `api-docs-researcher` before coding against third-party APIs, SDKs, migrations, or recent framework behavior.
 - Use `test-verifier` after implementation.
@@ -35,6 +34,8 @@ Do not paste the entire parent conversation into the subagent unless necessary.
 - Single trivial edit or one obvious tool call.
 - User asked explicitly for a single-thread reply.
 - Subagent is denied for the current primary (`permission.task`).
+
+For `orchestrator`, "do not delegate" never means "inspect or edit repo files directly." If a trivial request needs direct coding, switch to `build`; if it needs repo facts, delegate to `code-explorer`.
 
 ## Anti-patterns (avoid)
 
