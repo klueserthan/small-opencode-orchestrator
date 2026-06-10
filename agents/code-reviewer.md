@@ -17,6 +17,9 @@ permission:
     "grep *": allow
     "rg *": allow
     "git *": allow
+    "uv run ruff *": allow
+    "uv run pytest *": allow
+    "npx ctx7@latest *": allow
   webfetch: deny
   websearch: deny
 ---

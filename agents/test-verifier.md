@@ -22,6 +22,8 @@ permission:
     "grep *": allow
     "rg *": allow
     "git *": allow
+    "uv run ruff *": allow
+    "uv run pytest *": allow
 
     "rm *": ask
     "mv *": ask
