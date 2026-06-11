@@ -48,7 +48,7 @@
     },
     "plan-runner": {
       // stick with pro here aswell if you accept the speed vs quality tradeoff
-      "model": "ollama-cloud/deepseek-v4-pro",
+      "model": "opencode-go/deepseek-v4-pro",
       "reasoningEffort": "max",
       "textVerbosity": "medium",
       "temperature": 0.2,
