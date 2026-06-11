@@ -1,5 +1,12 @@
 {
   "version": "1.1.0",
+  "scripts": {
+    "provider:status": "./scripts/provider-toggle.sh status",
+    "provider:switch:ollama": "./scripts/provider-toggle.sh apply ollama-cloud",
+    "provider:switch:opencode": "./scripts/provider-toggle.sh apply opencode-go",
+    "provider:dry-run:ollama": "./scripts/provider-toggle.sh dry-run ollama-cloud",
+    "provider:dry-run:opencode": "./scripts/provider-toggle.sh dry-run opencode-go"
+  },
   "dependencies": {
     "@opencode-ai/plugin": "1.4.7"
   },

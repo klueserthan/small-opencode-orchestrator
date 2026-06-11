@@ -212,6 +212,31 @@ code-executor / build
 review subagents
 ```
 
+### Provider switching (opencode-go <-> ollama-cloud)
+
+If you run out of credits on one provider, use the built-in toggle script to switch model provider prefixes across the shared config and all subagent files.
+
+- `npm run provider:status` shows current provider counts on model lines.
+- `npm run provider:dry-run:ollama` previews switching from `opencode-go/*` to `ollama-cloud/*`.
+- `npm run provider:switch:ollama` applies that switch.
+- `npm run provider:dry-run:opencode` previews switching from `ollama-cloud/*` to `opencode-go/*`.
+- `npm run provider:switch:opencode` applies the reverse switch.
+
+Behavior notes:
+
+- This switch includes GLM model lines by default.
+- `openai/*` model lines are not touched.
+- Backups are written under `.provider-toggle-backups/<timestamp>/` before apply.
+
+Direct script usage is also available:
+
+```bash
+scripts/provider-toggle.sh status
+scripts/provider-toggle.sh dry-run ollama-cloud
+scripts/provider-toggle.sh apply ollama-cloud
+scripts/provider-toggle.sh apply opencode-go
+```
+
 ## Configuration
 
 Key settings in `opencode.jsonc`:
