@@ -43,3 +43,6 @@ tui.json
 
 # Plans
 /plans
+
+# Toggle backups
+/.provider-toggle-backups/
